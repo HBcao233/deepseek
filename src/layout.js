@@ -208,7 +208,13 @@ el-main {
     </el-button>
   </el-header>
   <el-main>
-    <ds-content .messages=${this.messages}></ds-content>
+    <ds-content 
+      .messages=${this.messages} 
+      @retry="${this.onRetry}" 
+      @reasoningtoggle="${(e) => { 
+        this.messages[e.detail.index].reasoning_open = e.detail.open; 
+        this.chats[this.currentChatIndex].messages = this.messages; window.localStorage.setItem('chats', JSON.stringify(this.chats)) } 
+    }"></ds-content>
   </el-main>
   <el-footer ?open="${this.messages.length}">
     <ds-input ?disabled="${this.running}" @send="${this.onSend}"></ds-input>
@@ -277,7 +283,12 @@ el-main {
     this.request(text);
   }
   
-  async request(text) {
+  onRetry(e) {
+    const message_id = e.detail.message_id;
+    this.request(this.messages[message_id-2], message_id);
+  }
+  
+  async request(text, retry_id) {
     if (!text) return;
     const index = this.currentChatIndex;
     const chat = this.chats[index];
@@ -286,10 +297,12 @@ el-main {
       role: 'system',
       content: system_propmt,
     }];
-    for (const { role, content } of this.messages) {
-      msgs.push({ role, content })
+    
+    const message_index = retry_id ? retry_id - 1: this.messages.length;
+    for (let i = 0; i < message_index; i++) {
+      const { role, content, error } = this.messages[i];
+      if (!error) msgs.push({ role, content })
     }
-    const message_index = this.messages.length;
     const message = {
       role: 'assistant',
       content: '',
@@ -297,22 +310,35 @@ el-main {
       reasoning: this.input.reasoning,
       created: 0,
       reasoning_end: 0,
+      error: false,
+      reasoning_open: true,
     };
-    this.messages.push(message);
-    
+    this.messages[retry_id - 1] = message;
+    chat.messages = this.messages;
+    this.requestUpdate();
+    this.ds_content.requestUpdate();
+      
     let url = new URL('https://hbcaodog--chat-chat.modal.run');
-    
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        msgs: msgs,
-        reasoning: this.input.reasoning,
-      }),
-    });
-    const reader = response.body.getReader();
+    let r;
+    try {
+      r = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          msgs: msgs,
+          reasoning: this.input.reasoning,
+        }),
+      });
+    } catch(e) {
+      message.error = true;
+      message.content = '请求错误，可点击下面按钮重试';
+      this.requestUpdate();
+      this.ds_content.requestUpdate();
+      return
+    }
+    const reader = r.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
     
@@ -336,13 +362,13 @@ el-main {
             break;
           }
           const { content: c, reasoning_content: r, created } = res.data;
-          this.messages[message_index].created = created;
-          if (c && !r) this.messages[message_index].reasoning_end = parseInt(Date.now() / 1000);
+          message.created = created;
+          if (c && !r) message.reasoning_end = parseInt(Date.now() / 1000);
           if (c) content.push(c);
           if (r) reasoning_content.push(r)
-          if (content) this.messages[message_index].content = content.join('');
-          if (reasoning_content) this.messages[message_index].reasoning_content = reasoning_content.join('');
-          chat.messages = this.messages;
+          if (content) message.content = content.join('');
+          if (reasoning_content) message.reasoning_content = reasoning_content.join('');
+          
           window.localStorage.setItem('chats', JSON.stringify(this.chats.filter(Boolean)));
           this.requestUpdate();
           this.ds_content.requestUpdate();
