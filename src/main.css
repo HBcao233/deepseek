@@ -4,8 +4,6 @@
   --dsw-alias-brand-primary: #3964fe;
   --dsw-specific-bubble: #edf3fe;
   --dsw-alias-interactive-bg-hover: rgba(38,49,72,.06);
-  --dsw-font-family: "quote-cjk-patch","Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Open Sans","Helvetica Neue",sans-serif;
-  --dsw-font-markdown-base: 16px/28px var(--dsw-font-family);
   --dsw-alias-interactive-bg-hover: rgba(38,49,72,.06);
   --dsw-alias-state-error-primary: #ec1313;
   --dsw-alias-interactive-bg-hover-danger: rgba(236,19,19,.05);

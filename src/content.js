@@ -1,4 +1,4 @@
-import { ElElement, html, css } from '/static/element-plus-lit.min.js';
+import { ElElement, html, css, nothing } from '/static/element-plus-lit.min.js';
 import { copyToClipboard } from './utils.js';
 
 class Content extends ElElement {
@@ -100,8 +100,110 @@ class Content extends ElElement {
 }
 
 .ds-markdown {
-  font: var(--dsw-font-markdown-base);
+  font-family: "quote-cjk-patch","Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Open Sans","Helvetica Neue",sans-serif;
+  font-size: 16px;
+  line-height: 28px;
   color: var(--dsw-alias-label-primary);
+}
+
+details {
+  margin-bottom: 10px;
+}
+
+summary {
+  list-style: none;
+  color: #61666b;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  flex-grow: 1;
+  align-items: center;
+  height: 100%;
+  transition: color .2s;
+  display: flex;
+}
+
+summary el-icon:first-child {
+  line-height: 0;
+  display: inline-flex;
+  color: #3964fe;
+  margin-right: 6px;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+summary span {
+  font-family: "quote-cjk-patch","Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Open Sans","Helvetica Neue",sans-serif;
+  font-size: 16px;
+  line-height: 28px;
+  align-items: center;
+  margin-right: 6px;
+  display: inline-flex;
+}
+summary:hover {
+  color: #0f1115;
+}
+
+summary el-icon:last-child {
+  line-height: 0;
+  display: inline-flex;
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+details:not([open]) summary el-icon:last-child svg path:last-child {
+  display: none;
+}
+details[open] summary el-icon:last-child svg path:first-child {
+  display: none;
+}
+
+details .reasoning-content {
+  margin: 0;
+  padding: 5px 0 5px 22px;
+  position: relative;
+}
+details[open] .reasoning-content {
+  padding-bottom: 0;
+}
+
+details .reasoning-content .ds-markdown {
+  font-size: 14px;
+  line-height: 24px;
+  color: #61666b;
+  height: calc(100% - 32px);
+}
+
+.dot {
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+  color: var(--dsw-alias-brand-primary);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  position: absolute;
+  top: 9px;
+  left: 0;
+  width: 16px;
+  height: 16px;
+}
+.dot div {
+  border-radius: 50%;
+  width: 5px;
+  height: 5px;
+  background-color: var(--dsw-alias-label-tertiary);
+  animation: none;
+}
+
+.line {
+  border-left: 1px solid #e1e5ea;
+  position: absolute;
+  top: 31px;
+  left: 7.5px;
+  height: calc(100% - 32px);
 }
   `;
   
@@ -119,7 +221,26 @@ class Content extends ElElement {
   <div class="messages-content">
     ${this.messages.map((m, index) => html`<div class="message ${m.role == 'user'? 'user-message' : 'assistant-message'}" data-um-id="${index+1}">
       <div class="ds-message">
-        ${m.role == 'user' ? html`<div class="ds-message-content" .innerText="${m.content}"></div>` : html`<el-markdown class="ds-markdown" .value="${m.content}"></el-markdown>`}
+        ${m.role == 'user' ? html`<div class="ds-message-content" .innerText="${m.content}"></div>` : html`${m.reasoning ? html`<details class="reasoning">
+  <summary class="reasoning-title">
+    <el-icon>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.00198 6.6446C8.75032 6.6446 9.35738 7.25175 9.35745 8.00007C9.35745 8.74844 8.75036 9.35554 8.00198 9.35554C7.25373 9.35539 6.64749 8.74835 6.64749 8.00007C6.64756 7.25184 7.25377 6.64474 8.00198 6.6446Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M9.97171 1.29987C11.5854 0.718977 13.271 0.642258 14.3145 1.68561C15.3578 2.72908 15.2811 4.41472 14.7002 6.02839C14.4708 6.66567 14.1505 7.32943 13.75 8.00007C14.1505 8.67068 14.4708 9.3345 14.7002 9.97175C15.2811 11.5854 15.3579 13.2711 14.3145 14.3145C13.2711 15.3579 11.5854 15.2812 9.97171 14.7003C9.33446 14.4708 8.67065 14.1505 8.00003 13.7501C7.32939 14.1505 6.66564 14.4708 6.02835 14.7003C4.41467 15.2812 2.72905 15.3578 1.68558 14.3145C0.642216 13.2711 0.718931 11.5854 1.29984 9.97175C1.52921 9.3346 1.84871 8.67055 2.24905 8.00007C1.84872 7.32959 1.52921 6.66551 1.29984 6.02839C0.718913 4.41465 0.642131 2.72906 1.68558 1.68561C2.72903 0.642173 4.41462 0.718948 6.02835 1.29987C6.66547 1.52925 7.32956 1.84876 8.00003 2.24909C8.67051 1.84875 9.33457 1.52925 9.97171 1.29987ZM12.9405 9.21296C12.4392 9.89306 11.8617 10.5681 11.2149 11.2149C10.5681 11.8617 9.89302 12.4392 9.21292 12.9405C9.62538 13.1579 10.0271 13.338 10.4121 13.4766C11.9147 14.0175 12.9173 13.8738 13.3955 13.3956C13.8738 12.9173 14.0175 11.9147 13.4766 10.4122C13.338 10.0272 13.1579 9.62541 12.9405 9.21296ZM3.05862 9.21296C2.84127 9.62529 2.66203 10.0273 2.52347 10.4122C1.98258 11.9147 2.12633 12.9173 2.60452 13.3956C3.08284 13.8737 4.08551 14.0175 5.58792 13.4766C5.9727 13.3381 6.37395 13.1578 6.78616 12.9405C6.1063 12.4393 5.43174 11.8615 4.78519 11.2149C4.13829 10.568 3.55999 9.8932 3.05862 9.21296ZM7.99905 3.79206C7.23185 4.31425 6.45312 4.95519 5.70413 5.70417C4.95515 6.45315 4.31421 7.2319 3.79202 7.99909C4.31437 8.76672 4.95477 9.54659 5.70413 10.296C6.45315 11.045 7.23277 11.6849 8.00003 12.2071C8.76731 11.6849 9.54689 11.045 10.2959 10.296C11.045 9.54692 11.6848 8.76735 12.2071 8.00007C11.6848 7.23281 11.0449 6.45318 10.2959 5.70417C9.54656 4.95481 8.76668 4.3144 7.99905 3.79206ZM5.58792 2.52351C4.08539 1.98261 3.08278 2.12632 2.60452 2.60456C2.12627 3.08281 1.98258 4.08542 2.52347 5.58796C2.66195 5.97259 2.84146 6.37415 3.05862 6.7862C3.55989 6.10617 4.13846 5.43196 4.78519 4.78522C5.43193 4.13849 6.10612 3.55993 6.78616 3.05866C6.37411 2.8415 5.97255 2.66198 5.58792 2.52351ZM13.3955 2.60456C12.9173 2.12637 11.9146 1.98263 10.4121 2.52351C10.0272 2.66207 9.62525 2.84131 9.21292 3.05866C9.89316 3.56002 10.568 4.13833 11.2149 4.78522C11.8614 5.43178 12.4393 6.10633 12.9405 6.7862C13.1577 6.37399 13.3381 5.97273 13.4766 5.58796C14.0174 4.08555 13.8737 3.08287 13.3955 2.60456Z" fill="currentColor"></path></svg>
+    </el-icon>
+    <span>${m.reasoning_end ? `已深度思考（用时 ${m.reasoning_end - m.created} 秒）` : '正在思考'}</span>
+    <el-icon>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5.50003 2.15137L5.92386 2.57617L8.6514 5.30273C8.90709 5.55843 9.13385 5.78438 9.29788 5.98828C9.46886 6.20088 9.61759 6.44405 9.66605 6.75C9.69225 6.91565 9.69225 7.08435 9.66605 7.25C9.61759 7.55595 9.46886 7.79912 9.29788 8.01172C9.13385 8.21561 8.90709 8.44157 8.6514 8.69727L5.92386 11.4238L5.50003 11.8486L4.6514 11L5.0762 10.5762L7.80276 7.84863C8.07735 7.57405 8.24852 7.40124 8.36234 7.25977C8.46907 7.12709 8.47816 7.07728 8.4805 7.0625C8.48706 7.02105 8.48706 6.97895 8.4805 6.9375C8.47816 6.92272 8.46907 6.87291 8.36233 6.74023C8.24852 6.59876 8.07735 6.42595 7.80276 6.15137L5.0762 3.42383L4.6514 3L5.50003 2.15137Z" fill="currentColor"></path>
+        <path d="M11.8487 5.5L11.4239 5.92383L8.6973 8.65137C8.4416 8.90706 8.21565 9.13382 8.01175 9.29785C7.79915 9.46883 7.55598 9.61756 7.25003 9.66602C7.08438 9.69222 6.91568 9.69222 6.75003 9.66602C6.44408 9.61756 6.20091 9.46883 5.98831 9.29785C5.78442 9.13382 5.55846 8.90706 5.30276 8.65137L2.5762 5.92383L2.1514 5.5L3.00003 4.65137L3.42386 5.07617L6.1514 7.80273C6.42598 8.07732 6.59879 8.24849 6.74026 8.3623C6.87294 8.46904 6.92275 8.47813 6.93753 8.48047C6.97898 8.48703 7.02108 8.48703 7.06253 8.48047C7.07731 8.47813 7.12712 8.46904 7.2598 8.3623C7.40127 8.24849 7.57408 8.07732 7.84866 7.80273L10.5762 5.07617L11 4.65137L11.8487 5.5Z" fill="currentColor"></path>
+      </svg>
+    </el-icon>
+  </summary>
+  <div class="reasoning-content">
+    <div class="dot"><div></div></div>
+    <div class="line"></div>
+    <el-markdown class="ds-markdown" .value="${m.reasoning_content}"></el-markdown>
+  </div>
+</details>` : nothing}
+<el-markdown class="ds-markdown" .value="${m.content}"></el-markdown>`}
       </div>
       <div class="message-controls-wrapper">
         <div class="message-controls">

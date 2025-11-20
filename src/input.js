@@ -209,7 +209,7 @@ el-button[circle]::part(content) {
     reasoning: {
       type: Boolean,
       state: true,
-      default: false,
+      default: !!window.localStorage.getItem('reasoning'),
     },
     value: {
       type: String,
@@ -221,6 +221,10 @@ el-button[circle]::part(content) {
       default: false,
       attribute: true,
     },
+  }
+  
+  updated(changedProps) {
+    if (changedProps.has('reasoning')) window.localStorage.setItem('reasoning', parseInt(this.reasoning));
   }
 
   render() {

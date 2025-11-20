@@ -291,9 +291,12 @@ el-main {
     }
     const message_index = this.messages.length;
     const message = {
-      'role': 'assistant',
-      'content': '',
-      'reasoning': '',
+      role: 'assistant',
+      content: '',
+      reasoning_content: '',
+      reasoning: this.input.reasoning,
+      created: 0,
+      reasoning_end: 0,
     };
     this.messages.push(message);
     
@@ -314,7 +317,7 @@ el-main {
     let buffer = '';
     
     const content = [];
-    const reasoning = [];
+    const reasoning_content = [];
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -332,11 +335,13 @@ el-main {
             content.push(res.data.content);
             break;
           }
-          const { content: c, reasoning: r } = res.data;
+          const { content: c, reasoning_content: r, created } = res.data;
+          this.messages[message_index].created = created;
+          if (c && !r) this.messages[message_index].reasoning_end = parseInt(Date.now() / 1000);
           if (c) content.push(c);
-          if (r) reasoning.push(r)
-          this.messages[message_index].content = content.join('');
-          if (reasoning) this.messages[message_index].reasoning = reasoning.join('');
+          if (r) reasoning_content.push(r)
+          if (content) this.messages[message_index].content = content.join('');
+          if (reasoning_content) this.messages[message_index].reasoning_content = reasoning_content.join('');
           chat.messages = this.messages;
           window.localStorage.setItem('chats', JSON.stringify(this.chats));
           this.requestUpdate();
