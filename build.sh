@@ -1,3 +1,6 @@
+npx rollup -c
+npx terser deepseek.js -o deepseek.min.js -c -m
+cat << EOF > index.html
 <!doctype html>
 <html lang="en">
   <head>
@@ -11,9 +14,10 @@
     <link rel="icon" type="image/x-icon" href="/favicon.svg">
     
     <link rel="stylesheet" href="/src/main.css">
-    <script defer type="module" src="/src/index.js"></script>
+    <script defer type="module" src="/deepseek.min.js"></script>
 </head>
 <body>
   <ds-app></ds-app>
 </body>
 </html>
+EOF

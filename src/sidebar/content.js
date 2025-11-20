@@ -1,4 +1,4 @@
-import { ElElement, html, css } from '/static/element-plus-lit.min.js';
+import { ElElement, html, css } from '/src/element-plus-lit.min.js';
 
 class SidebarContent extends ElElement {
   static styles = css`

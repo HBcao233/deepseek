@@ -1,0 +1,23 @@
+{
+  "name": "deepseek",
+  "version": "0.0.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "Deepseek UI",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HBcao233/deepseek.git",
+    "directory": "."
+  },
+  "author": "HBcao233",
+  "homepage": "https://github.com/HBcao233/deepseek",
+  "main": "index.js",
+  "module": "index.js",
+  "type": "module",
+  "devDependencies": {
+    "rollup": "^4.53.2",
+    "terser": "^5.44.1"
+  }
+}

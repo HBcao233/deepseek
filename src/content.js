@@ -1,4 +1,4 @@
-import { ElElement, html, css, nothing } from '/static/element-plus-lit.min.js';
+import { ElElement, html, css } from '/src/element-plus-lit.min.js';
 import { copyToClipboard } from './utils.js';
 
 class Content extends ElElement {
