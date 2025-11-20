@@ -1,5 +1,6 @@
 import { ElElement, html, css, nothing } from '/src/element-plus-lit.min.js';
-import { copyToClipboard } from './utils.js';
+import { copyToClipboard, scrollTo } from './utils.js';
+
 
 class Content extends ElElement {
   static styles = css`
@@ -274,6 +275,29 @@ details .reasoning-content .ds-markdown {
     )}
   </div>
 </el-scrollbar>`;
+  }
+  
+  firstUpdated() {
+    let scroll_timer = null;
+    this.scrollbar = this.renderRoot.firstElementChild;
+    const preventAutoScroll = () => {
+      this.scrollbar.scrolling = true;
+      clearTimeout(scroll_timer);
+      scroll_timer = setTimeout(() => {
+        this.scrollbar.scrolling = false;
+      }, 2000);
+    }
+    this.scrollbar.addEventListener('wheel', preventAutoScroll);
+    this.scrollbar.addEventListener('touchmove', preventAutoScroll);
+  }
+  
+  updated(changedProps) {
+    if (this.messages.length > 0) requestAnimationFrame(() => {
+      const element = this.scrollbar.renderRoot.firstElementChild;
+      if (element && !this.scrollbar.scrolling) {
+        scrollTo(element, element.scrollHeight, 300);
+      }
+    })
   }
   
   retry(e) {

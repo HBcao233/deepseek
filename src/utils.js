@@ -40,3 +40,28 @@ export function formatDateLess(d) {
   if (date.getFullYear() == now.getFullYear()) return t.slice(t.indexOf('-') + 1, t.lastIndexOf(' '));
   return t.slice(0, t.lastIndexOf(' '));
 }
+
+export const easeOutQuad = (t) => {
+  return 1.74 * t ** 2 - 0.74 * t** 3;
+}
+export function scrollTo(element, to, duration) {
+  const start = element.scrollTop ?? 0;
+  const change = to - start;
+  let startTime = null;
+
+  function animateScroll(currentTime) {
+    if (element.scrolling) return;
+    if (startTime === null) {
+      startTime = currentTime;
+    }
+    const timeElapsed = currentTime - startTime;
+    const progress = Math.min(timeElapsed / duration, 1);
+    const easedProgress = easeOutQuad(progress); // 使用缓动函数
+    element.scrollTop = start + change * easedProgress;
+
+    if (timeElapsed < duration) {
+      requestAnimationFrame(animateScroll);
+    }
+  }
+  requestAnimationFrame(animateScroll);
+}
