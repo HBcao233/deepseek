@@ -7,20 +7,11 @@
   ],
   "headers": [
     {
-      "source": "/deepseek.min.js",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=0, s-maxage=0, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/static/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=14400, s-maxage=14400, must-revalidate"
         }
       ]
     }
