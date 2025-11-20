@@ -273,7 +273,7 @@ el-main {
       })
     }
     if (!this.currentChat) this.currentChat = new_id;
-    window.localStorage.setItem('chats', JSON.stringify(this.chats));
+    window.localStorage.setItem('chats', JSON.stringify(this.chats.filter(Boolean)));
     this.request(text);
   }
   
@@ -343,7 +343,7 @@ el-main {
           if (content) this.messages[message_index].content = content.join('');
           if (reasoning_content) this.messages[message_index].reasoning_content = reasoning_content.join('');
           chat.messages = this.messages;
-          window.localStorage.setItem('chats', JSON.stringify(this.chats));
+          window.localStorage.setItem('chats', JSON.stringify(this.chats.filter(Boolean)));
           this.requestUpdate();
           this.ds_content.requestUpdate();
         }
@@ -401,7 +401,7 @@ el-main {
     const index = this.getChatIndex(chat_id);
     if (!this.chats[index] || this.chats[index].name === newName) return;
     this.chats[index].name = newName;
-    window.localStorage.setItem('chats', JSON.stringify(this.chats));
+    window.localStorage.setItem('chats', JSON.stringify(this.chats.filter(Boolean)));
     this.requestUpdate();
   }
   
@@ -410,7 +410,7 @@ el-main {
     const index = this.getChatIndex(chat_id);
     if (!this.chats[index]) return;
     delete this.chats[index];
-    window.localStorage.setItem('chats', JSON.stringify(this.chats));
+    window.localStorage.setItem('chats', JSON.stringify(this.chats.filter(Boolean)));
     if (chat_id === this.currentChat) this.currentChat = '';
     this.requestUpdate();
   }
