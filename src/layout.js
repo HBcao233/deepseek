@@ -185,9 +185,7 @@ el-main {
   <el-aside>
     <ds-sidebar 
       .sidebars="${this.sidebars}" 
-      ?open="${this.sidebar_open}" 
       .currentChat="${this.currentChat}" 
-      @hide="${this.onSidebarHide}" 
       @switchchat="${this.switchChat}" 
       @newchat="${this.newChat}"
       @renamechat="${this.renameChat}"
@@ -245,14 +243,18 @@ el-main {
     return -1;
   }
   
-  firstUpdated() {
-    this.ds_content = this.renderRoot.querySelector('ds-content');
-    this.input = this.renderRoot.querySelector('ds-input');
+  get sidebar_open() {
+    return this.ds_sidebar?.open;
   }
   
-  onSidebarHide(e) {
-    if (e.composedPath()[0].localName !== 'ds-sidebar') return;
-    this.sidebar_open = false;
+  set sidebar_open(v) {
+    this.ds_sidebar.open = !!v;
+  }
+  
+  firstUpdated() {
+    this.ds_sidebar = this.renderRoot.querySelector('ds-sidebar');
+    this.ds_content = this.renderRoot.querySelector('ds-content');
+    this.input = this.renderRoot.querySelector('ds-input');
   }
   
   onSend(e) {
