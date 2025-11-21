@@ -14,7 +14,7 @@ cat << EOF > index.html
     <link rel="icon" type="image/x-icon" href="/favicon.svg">
     
     <link rel="stylesheet" href="/src/main.css">
-    <script defer type="module" src="/deepseek.min.js?v=3"></script>
+    <script defer type="module" src="/deepseek.min.js?v=4"></script>
 </head>
 <body>
   <ds-app></ds-app>
