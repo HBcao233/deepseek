@@ -1,5 +1,8 @@
 npx rollup -c
-npx terser deepseek.js -o deepseek.min.js -c -m
+hash=$(md5sum deepseek.js)
+hash=${hash:0:10}
+name=deepseek.${hash}.js
+npx terser deepseek.js -o $name -c -m
 cat << EOF > index.html
 <!doctype html>
 <html lang="en">
@@ -14,7 +17,7 @@ cat << EOF > index.html
     <link rel="icon" type="image/x-icon" href="/favicon.svg">
     
     <link rel="stylesheet" href="/src/main.css">
-    <script defer type="module" src="/deepseek.min.js?v=5"></script>
+    <script defer type="module" src="/$name"></script>
 </head>
 <body>
   <ds-app></ds-app>
