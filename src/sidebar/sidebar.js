@@ -6,8 +6,22 @@ import { copyToClipboard } from '/src/utils.js';
 
 class Sidebar extends ElElement {
   static styles = css`
-:host {
-  display: contents;
+el-sidebar {
+  --el-sidebar-width: 261px;
+  --el-sidebar-bg-color: #f9fafb;
+}
+
+el-sidebar::part(el-overlay) {
+  background-color: rgba(0,0,0,.4)
+}
+
+el-sidebar::part(el-sidebar) {
+  box-sizing: border-box;
+  padding: 6px 12px 10px;
+  border-right: 1px solid rgba(0,0,0,.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .logo-box {
@@ -210,73 +224,75 @@ el-input::part(inner) {
       role = this.roles?.[this.currentRole] ?? { avatar: '/assets/0.jpg', name: '小派魔' };
     }
     return html`
-<div class="logo-box">
-  <div class="logo" @click="${this.newChat}">${DeepseekLogo}</div>
-  
-  <el-button class="sidebar-back" @click=${() => this.open = false}>
-    <el-icon slot="icon">${SidebarClose}</el-icon>
-  </el-button>
-</div>
-<el-button class="sidebar-new-chat" @click="${this.newChat}">
-  <el-icon slot="icon">${SidebarNewChat}</el-icon>
-  开启新对话
-</el-button>
-<el-scrollbar>
-  <ds-sidebar-content .sidebars="${this.sidebars}" .currentChat="${this.currentChat}"></ds-sidebar-content>
-</el-scrollbar>
-<div class="role currentRole" @click="${this.roleClick}">
-  <div class="avatar">
-    ${role?.avatar ? html`<img src="${role?.avatar}" onerror="this.src = '/assets/avatar.svg'">` : svg`<svg viewBox="0 0 32 32"><text x="16" y="16" text-anchor="middle" dominant-baseline="middle" fill="currentColor" font-size="20">${role?.name[0]}</text></svg>`}
+<el-sidebar .open="${this.open}" @update:open="${(e) => this.open = e.detail.newValue}">
+  <div class="logo-box">
+    <div class="logo" @click="${this.newChat}">${DeepseekLogo}</div>
+    
+    <el-button class="sidebar-back" @click=${() => this.open = false}>
+      <el-icon slot="icon">${SidebarClose}</el-icon>
+    </el-button>
   </div>
-  <div class="name">${this.roles?.[this.currentRole]?.name ?? '小派魔'}</div>
-  <el-icon class="more">${More}</el-icon>
-  <div class="roles" popover="auto">
-    ${repeat([
-      ...default_roles.map((item, index) => (item.index = -(index+1), item)),
-      ...(this.roles || []).map((item, index) => (item.index = index, item)),
-    ], (item) => item.index, (item) => html`
-      <div class="role${this.currentRole === item.index ? ' active': ''}" @click="${() => { if (this.currentRole !== item.index) this.switchRole(item.index)} }">
-        <div class="avatar">
-          ${item.avatar ? html`<img src="${item.avatar}" onerror="this.src = '/assets/avatar.svg'">` : svg`<svg viewBox="0 0 32 32"><text x="16" y="16" text-anchor="middle" dominant-baseline="middle" fill="currentColor" font-size="20">${item.name[0]}</text></svg>`}
+  <el-button class="sidebar-new-chat" @click="${this.newChat}">
+    <el-icon slot="icon">${SidebarNewChat}</el-icon>
+    开启新对话
+  </el-button>
+  <el-scrollbar>
+    <ds-sidebar-content .sidebars="${this.sidebars}" .currentChat="${this.currentChat}"></ds-sidebar-content>
+  </el-scrollbar>
+  <div class="role currentRole" @click="${this.roleClick}">
+    <div class="avatar">
+      ${role?.avatar ? html`<img src="${role?.avatar}" onerror="this.src = '/assets/avatar.svg'">` : svg`<svg viewBox="0 0 32 32"><text x="16" y="16" text-anchor="middle" dominant-baseline="middle" fill="currentColor" font-size="20">${role?.name[0]}</text></svg>`}
+    </div>
+    <div class="name">${this.roles?.[this.currentRole]?.name ?? '小派魔'}</div>
+    <el-icon class="more">${More}</el-icon>
+    <div class="roles" popover="auto">
+      ${repeat([
+        ...default_roles.map((item, index) => (item.index = -(index+1), item)),
+        ...(this.roles || []).map((item, index) => (item.index = index, item)),
+      ], (item) => item.index, (item) => html`
+        <div class="role${this.currentRole === item.index ? ' active': ''}" @click="${() => { if (this.currentRole !== item.index) this.switchRole(item.index)} }">
+          <div class="avatar">
+            ${item.avatar ? html`<img src="${item.avatar}" onerror="this.src = '/assets/avatar.svg'">` : svg`<svg viewBox="0 0 32 32"><text x="16" y="16" text-anchor="middle" dominant-baseline="middle" fill="currentColor" font-size="20">${item.name[0]}</text></svg>`}
+          </div>
+          <div class="name">${item.name}</div>
+          <el-icon class="more" @click="${this.showRoleDialog.bind(this, item.index)}">${More}</el-icon>
         </div>
-        <div class="name">${item.name}</div>
-        <el-icon class="more" @click="${this.showRoleDialog.bind(this, item.index)}">${More}</el-icon>
+      `)}
+      <div class="role add-role" @click="${this.showRoleDialog.bind(this, null)}">
+        <div class="avatar">
+          <el-icon icon="Plus"></el-icon>
+        </div>
+        <div class="name">新建</div>
       </div>
-    `)}
-    <div class="role add-role" @click="${this.showRoleDialog.bind(this, null)}">
-      <div class="avatar">
-        <el-icon icon="Plus"></el-icon>
-      </div>
-      <div class="name">新建</div>
     </div>
   </div>
-</div>
-
-<el-dialog .open="${this.dialogOpen}" @update:open="${(e) => {
-  this.dialogOpen = e.detail.newValue;
-  this.rolesRef.showPopover() 
-} }" .title="${this.roleDialogModal.title}">
-  <el-form @submit="${this.onSubmit}">
-    <el-form-item label="名称">
-      <el-input name="name" placeholder="新角色" .value="${this.roleDialogModal.name}" ?disabled="${this.roleDialogModal.internal}"></el-input>
-    </el-form-item>
-    <el-form-item label="头像链接">
-      <el-input name="avatar" placeholder="" .value="${this.roleDialogModal.avatar}" ?disabled="${this.roleDialogModal.internal}"></el-input>
-    </el-form-item>
-    <el-form-item>
-      <div slot="label">
-        <span>系统提示词</span>
-        <el-button circle @click="${() => copyToClipboard(this.roleDialogModal.prompt)}"><el-icon slot="icon">${Copy}</el-icon></el-button>
-      </div>
-      <el-input type="textarea" name="prompt" placeholder="你是一个AI助手" autosize .value="${this.roleDialogModal.prompt}" ?disabled="${this.roleDialogModal.internal}"></el-input>
-    </el-form-item>
-  </el-form>
-  <div slot="footer">
-    <el-button type="danger" ?disabled="${!this.roleDialogModal.edit}" @click="${this.deleteRole}">删除</el-button>
-    <el-button type="primary" @click="${() => this.form.submit()}">${this.roleDialogModal.new ? '创建' : '确定'}</el-button>
-    <el-button @click="${() => this.dialogOpen = false}">取消</el-button>
-  </div>
-</el-dialog>`;
+  
+  <el-dialog .open="${this.dialogOpen}" @update:open="${(e) => {
+    this.dialogOpen = e.detail.newValue;
+    this.rolesRef.showPopover() 
+  } }" .title="${this.roleDialogModal.title}">
+    <el-form @submit="${this.onSubmit}">
+      <el-form-item label="名称">
+        <el-input name="name" placeholder="新角色" .value="${this.roleDialogModal.name}" ?disabled="${this.roleDialogModal.internal}"></el-input>
+      </el-form-item>
+      <el-form-item label="头像链接">
+        <el-input name="avatar" placeholder="" .value="${this.roleDialogModal.avatar}" ?disabled="${this.roleDialogModal.internal}"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <div slot="label">
+          <span>系统提示词</span>
+          <el-button circle @click="${() => copyToClipboard(this.roleDialogModal.prompt)}"><el-icon slot="icon">${Copy}</el-icon></el-button>
+        </div>
+        <el-input type="textarea" name="prompt" placeholder="你是一个AI助手" autosize .value="${this.roleDialogModal.prompt}" ?disabled="${this.roleDialogModal.internal}"></el-input>
+      </el-form-item>
+    </el-form>
+    <div slot="footer">
+      <el-button type="danger" ?disabled="${!this.roleDialogModal.edit}" @click="${this.deleteRole}">删除</el-button>
+      <el-button type="primary" @click="${() => this.form.submit()}">${this.roleDialogModal.new ? '创建' : '确定'}</el-button>
+      <el-button @click="${() => this.dialogOpen = false}">取消</el-button>
+    </div>
+  </el-dialog>
+</el-sidebar>`;
   }
   
   firstUpdated() {

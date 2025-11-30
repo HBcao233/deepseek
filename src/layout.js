@@ -4,7 +4,7 @@ import { Bars, Mobile, NewChat } from '/src/svgs.js';
 import { default_roles } from '/src/constants.js';
 
 
-const version = '2025-11-30';
+const version = '2025-11-30-1';
 
 
 class Layout extends ElElement {
@@ -12,24 +12,6 @@ class Layout extends ElElement {
 el-container {
   padding: 0;
   height: 100%;
-}
-
-el-sidebar {
-  --el-sidebar-width: 261px;
-  --el-sidebar-bg-color: #f9fafb;
-}
-
-el-sidebar::part(el-overlay) {
-  background-color: rgba(0,0,0,.4)
-}
-
-el-sidebar::part(el-sidebar) {
-  box-sizing: border-box;
-  padding: 6px 12px 10px;
-  border-right: 1px solid rgba(0,0,0,.04);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
 }
 
 
@@ -212,26 +194,23 @@ el-footer[open] .changelog {
     return html`
 <el-container>
   <el-aside>
-    <el-sidebar 
+    <ds-sidebar 
       .open="${this.sidebar_open}" 
       @update:open="${(e) => this.sidebar_open = e.detail.newValue}"
-    >
-      <ds-sidebar 
-        .sidebars="${this.sidebars}" 
-        .currentChat="${this.currentChat}" 
-        .roles=${this.roles}
-        .currentRole="${this.currentRole}"
-        @update:currentRole="${(e) => this.currentRole = e.detail.newValue}"
-        @switchchat="${this.switchChat}" 
-        @newchat="${this.newChat}"
-        @renamechat="${this.renameChat}"
-        @deletechat="${this.deleteChat}"
-        @newRole="${this.newRole}"
-        @editRole="${this.editRole}"
-        @switchRole="${this.switchRole}"
-        @deleteRole="${this.deleteRole}"
-      ></ds-sidebar>
-    </el-sidebar>
+      .sidebars="${this.sidebars}" 
+      .currentChat="${this.currentChat}" 
+      .roles=${this.roles}
+      .currentRole="${this.currentRole}"
+      @update:currentRole="${(e) => this.currentRole = e.detail.newValue}"
+      @switchchat="${this.switchChat}" 
+      @newchat="${this.newChat}"
+      @renamechat="${this.renameChat}"
+      @deletechat="${this.deleteChat}"
+      @newRole="${this.newRole}"
+      @editRole="${this.editRole}"
+      @switchRole="${this.switchRole}"
+      @deleteRole="${this.deleteRole}"
+    ></ds-sidebar>
   </el-aside>
   <el-header height="60">
     <el-button class="sidebar-button" @click="${() => (this.sidebar_open = true)}">
@@ -261,6 +240,10 @@ el-footer[open] .changelog {
     <ds-input ?disabled="${this.running}" @send="${this.onSend}"></ds-input>
     ${this.version ? html`<div class="changelog" style="${this.version === version ? 'display: none': ''}">
       <h2>更新日志</h2>
+      <h3>2025-11-30-1</h3>
+      <ul>
+        <li>修复对话选项显示位置错误的问题</li>
+      </ul>
       <h3>2025-11-30</h3>
       <ul>
         <li>支持创建角色并指定系统提示词</li>
