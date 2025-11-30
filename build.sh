@@ -3,6 +3,7 @@ hash=$(md5sum deepseek.js)
 hash=${hash:0:10}
 name=deepseek.${hash}.js
 npx terser deepseek.js -o $name -c -m
+echo "output $name"
 cat << EOF > index.html
 <!doctype html>
 <html lang="en">

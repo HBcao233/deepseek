@@ -1,3 +1,13 @@
+import '/assets/localforage.min.js';
+
+
+export const getValue = (k, callback) => {
+  return localforage.getItem(k, callback);
+}
+export const setValue = (k, v, callback) => {
+  localforage.setItem(k, v, callback);
+}
+
 export const copyToClipboard = (text) => {
   let nav = navigator || window.navigator;
   if (nav && nav.clipboard && nav.clipboard.writeText) {

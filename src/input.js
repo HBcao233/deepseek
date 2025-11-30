@@ -1,4 +1,4 @@
-import { ElElement, html, css } from '/src/element-plus-lit.min.js';
+import { ElElement, html, css } from '/assets/element-plus-lit.min.js';
 
 class Input extends ElElement {
   static styles = css`
