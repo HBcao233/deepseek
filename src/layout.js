@@ -4,7 +4,22 @@ import { Bars, Mobile, NewChat } from '/src/svgs.js';
 import { default_roles } from '/src/constants.js';
 
 
-const version = '2025-11-30-1';
+const version = '2025-12-01';
+const changelogs = html`
+<h3>2025-12-01</h3>
+<ul>
+  <li>修复有时无法切换历史对话的问题</li>
+  <li>修复当前选择的内置角色始终显示为小派魔的问题</li>
+</ul>
+<h3>2025-11-30-1</h3>
+<ul>
+  <li>修复对话选项显示位置错误的问题</li>
+</ul>
+<h3>2025-11-30</h3>
+<ul>
+  <li>支持创建角色并指定系统提示词</li>
+  <li>修复反复开关侧边栏导致页面显示出错的问题</li>
+</ul>`;
 
 
 class Layout extends ElElement {
@@ -202,10 +217,10 @@ el-footer[open] .changelog {
       .roles=${this.roles}
       .currentRole="${this.currentRole}"
       @update:currentRole="${(e) => this.currentRole = e.detail.newValue}"
-      @switchchat="${this.switchChat}" 
-      @newchat="${this.newChat}"
-      @renamechat="${this.renameChat}"
-      @deletechat="${this.deleteChat}"
+      @switchChat="${this.switchChat}" 
+      @newChat="${this.newChat}"
+      @renameChat="${this.renameChat}"
+      @deleteChat="${this.deleteChat}"
       @newRole="${this.newRole}"
       @editRole="${this.editRole}"
       @switchRole="${this.switchRole}"
@@ -240,19 +255,7 @@ el-footer[open] .changelog {
     <ds-input ?disabled="${this.running}" @send="${this.onSend}"></ds-input>
     ${this.version ? html`<div class="changelog" style="${this.version === version ? 'display: none': ''}">
       <h2>更新日志</h2>
-      <h3>2025-12-01</h3>
-      <ul>
-        <li>修复当前选择的内置角色始终显示为小派魔的问题</li>
-      </ul>
-      <h3>2025-11-30-1</h3>
-      <ul>
-        <li>修复对话选项显示位置错误的问题</li>
-      </ul>
-      <h3>2025-11-30</h3>
-      <ul>
-        <li>支持创建角色并指定系统提示词</li>
-        <li>修复反复开关侧边栏导致页面显示出错的问题</li>
-      </ul>
+      ${changelogs}
       <el-button circle icon="Close" @click="${() => {this.version = version; setValue('version', version) }}"></el-button>
     </div>` : nothing}
     <div class="footer">内容由 AI 生成，请仔细甄别</div>
@@ -488,11 +491,11 @@ el-footer[open] .changelog {
   }
   
   switchChat(e) {
-    if (!e.detail.href) return;
-    const url = new URL(e.detail.href);
-    window.history.pushState(null, '', url.pathname);
+    const id = e.detail.id;
+    if (!id) return;
+    window.history.pushState(null, '', `/a/chat/s/${id}`);
     this.sidebar_open = false;
-    this.currentChat = window.location.pathname.slice(10);
+    this.currentChat = id;
   }
   
   newChat() {

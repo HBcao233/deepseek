@@ -334,7 +334,7 @@ el-input::part(inner) {
   }
   
   newChat() {
-    this.dispatchEvent(new Event('newchat', {
+    this.dispatchEvent(new Event('newChat', {
       bubbles: true,
       composed: true,
       cancelable: false,

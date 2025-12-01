@@ -216,7 +216,12 @@ ${Object.entries(this.sidebars).map(([title, items]) => html`
 <div class="sidebar-group">
   <p class="sidebar-group__title">${title}</p>
   ${items.map(item => html`
-    <a class="sidebar-link${this.currentChat == item.id ? ' active':''}" href="/a/chat/s/${item.id}" @click="${this.switchChat}" data-chat="${item.id}">
+    <a 
+      class="sidebar-link${this.currentChat === item.id ? ' active':''}" 
+      href="/a/chat/s/${item.id}" 
+      @click="${(e) => this.switchChat(e, item.id)}" 
+      data-chat="${item.id}"
+    >
       <p class="link-text">${item.name}</p>
       <div class="sidebar-link-controls">
         <el-dropdown placement="bottom">
@@ -264,17 +269,17 @@ ${Object.entries(this.sidebars).map(([title, items]) => html`
     `;
   }
   
-  switchChat(e) {
+  switchChat(e, id) {
     e.preventDefault();
-    
-    if (e.composedPath()[0].localName !== 'a') return;
-    if (e.target.classList.contains('active')) return;
-    this.dispatchEvent(new CustomEvent('switchchat', {
+    const paths = e.composedPath();
+    if (paths[0].localName !== 'a' && paths[0].localName !== 'p') return;
+    if (this.currentChat === id) return;
+    this.dispatchEvent(new CustomEvent('switchChat', {
       bubbles: true,
       composed: true,
       cancelable: false,
       detail: {
-        href: e.target.href,
+        id,
       },
     }));
   }
@@ -295,7 +300,7 @@ ${Object.entries(this.sidebars).map(([title, items]) => html`
     const input = link.querySelector('.rename-chat');
     input.classList.remove('show');
     const chat_id = link.dataset.chat;
-    this.dispatchEvent(new CustomEvent('renamechat', {
+    this.dispatchEvent(new CustomEvent('renameChat', {
       bubbles: true,
       composed: true,
       cancelable: false,
@@ -321,7 +326,7 @@ ${Object.entries(this.sidebars).map(([title, items]) => html`
     dialog.hide();
     const link = e.target.closest('a');
     const chat_id = link.dataset.chat;
-    this.dispatchEvent(new CustomEvent('deletechat', {
+    this.dispatchEvent(new CustomEvent('deleteChat', {
       bubbles: true,
       composed: true,
       cancelable: false,
