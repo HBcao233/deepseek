@@ -243,7 +243,7 @@ el-input::part(inner) {
     <div class="avatar">
       ${role?.avatar ? html`<img src="${role?.avatar}" onerror="this.src = '/assets/avatar.svg'">` : svg`<svg viewBox="0 0 32 32"><text x="16" y="16" text-anchor="middle" dominant-baseline="middle" fill="currentColor" font-size="20">${role?.name[0]}</text></svg>`}
     </div>
-    <div class="name">${this.roles?.[this.currentRole]?.name ?? '小派魔'}</div>
+    <div class="name">${role?.name ?? '小派魔'}</div>
     <el-icon class="more">${More}</el-icon>
     <div class="roles" popover="auto">
       ${repeat([

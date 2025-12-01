@@ -240,6 +240,10 @@ el-footer[open] .changelog {
     <ds-input ?disabled="${this.running}" @send="${this.onSend}"></ds-input>
     ${this.version ? html`<div class="changelog" style="${this.version === version ? 'display: none': ''}">
       <h2>更新日志</h2>
+      <h3>2025-12-01</h3>
+      <ul>
+        <li>修复当前选择的内置角色始终显示为小派魔的问题</li>
+      </ul>
       <h3>2025-11-30-1</h3>
       <ul>
         <li>修复对话选项显示位置错误的问题</li>
