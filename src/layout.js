@@ -399,7 +399,7 @@ el-footer[open] .changelog {
     this.requestUpdate();
     this.ds_content.requestUpdate();
       
-    let url = new URL('https://hbcaodog--chat-chat.modal.run');
+    let url = new URL('https://chat.lolih.dpdns.org');
     let r;
     try {
       r = await fetch(url, {
