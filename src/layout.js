@@ -4,10 +4,11 @@ import { Bars, Mobile, NewChat } from '/src/svgs.js';
 import { default_roles } from '/src/constants.js';
 
 
-const version = '2026-01-07.0';
+const version = '2026-01-07.1';
 const changelogs = html`
 <h3>2026-01-07</h3>
 <ul>
+  <li>新增内置角色: 完美许愿器</li>
   <li>输入框显示当前对话角色</li>
   <li>修复了一些已知问题</li>
 </ul>
