@@ -4,8 +4,13 @@ import { Bars, Mobile, NewChat } from '/src/svgs.js';
 import { default_roles } from '/src/constants.js';
 
 
-const version = '2025-12-01';
+const version = '2026-01-07.0';
 const changelogs = html`
+<h3>2026-01-07</h3>
+<ul>
+  <li>输入框显示当前对话角色</li>
+  <li>修复了一些已知问题</li>
+</ul>
 <h3>2025-12-01</h3>
 <ul>
   <li>修复有时无法切换历史对话的问题</li>
@@ -28,7 +33,6 @@ el-container {
   padding: 0;
   height: 100%;
 }
-
 
 el-header {
   padding: 12px 10px 4px;
@@ -198,7 +202,6 @@ el-footer[open] .changelog {
     currentRole: {
       type: Number,
       state: true,
-      default: -1,
     },
     version: {
       state: true,
@@ -240,6 +243,7 @@ el-footer[open] .changelog {
       <el-icon slot="icon">${NewChat}</el-icon>
     </el-button>
   </el-header>
+  
   <el-main>
     <ds-content 
       .messages=${this.messages} 
@@ -251,8 +255,13 @@ el-footer[open] .changelog {
       } 
     }"></ds-content>
   </el-main>
+  
   <el-footer ?open="${this.messages.length}">
-    <ds-input ?disabled="${this.running}" @send="${this.onSend}"></ds-input>
+    <ds-input 
+      ?disabled="${this.running}"
+      currentRoleName="${this.getCurrentRole()?.name ?? 'DeepSeek'}"
+      @send="${this.onSend}"
+    ></ds-input>
     ${this.version ? html`<div class="changelog" style="${this.version === version ? 'display: none': ''}">
       <h2>更新日志</h2>
       ${changelogs}
@@ -360,20 +369,23 @@ el-footer[open] .changelog {
     this.request(message_id);
   }
   
+  getCurrentRole() {
+    if (this.currentRole === undefined || this.currentRole === null) return null;
+    if (this.currentRole < 0) {
+      return default_roles[-this.currentRole - 1];
+    } 
+    return this.roles[this.currentRole];
+  }
+  
   async request(retry_id) {
     const index = this.currentChatIndex;
     const chat = this.chats[index];
     
-    let role;
-    if (this.currentRole < 0) {
-      role = default_roles[-this.currentRole - 1];
-    } else {
-      role = this.roles[this.currentRole];
-    }
-    if (!role) {
+    const character = this.getCurrentRole();
+    if (!character) {
       return alert('角色初始化错误, 请到派魔的频道 t.me/@HBcaoHouse 反馈bug喵')
     }
-    const system_prompt = role?.prompt || default_roles[0].prompt;
+    const system_prompt = character?.prompt || default_roles[0].prompt;
     const msgs = [{
       role: 'system',
       content: system_prompt,

@@ -7,12 +7,13 @@ hash=${hash:0:10}
 name=deepseek.${hash}.js
 npx terser deepseek.js -o $output_dir/$name -c -m
 echo "output $output_dir/$name"
+
 cp -r assets $output_dir/
 cp src/main.css $output_dir/
 cp favicon.svg $output_dir/
 
 cat << EOF > $output_dir/index.html
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />

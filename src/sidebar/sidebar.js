@@ -214,6 +214,11 @@ el-input::part(inner) {
       type: Boolean,
       state: true,
     },
+    rolesShow: {
+      type: Boolean,
+      state: true,
+      default: false,
+    },
   }
   
   render() {
@@ -236,16 +241,18 @@ el-input::part(inner) {
     <el-icon slot="icon">${SidebarNewChat}</el-icon>
     开启新对话
   </el-button>
+  
   <el-scrollbar>
     <ds-sidebar-content .sidebars="${this.sidebars}" .currentChat="${this.currentChat}"></ds-sidebar-content>
   </el-scrollbar>
+  
   <div class="role currentRole" @click="${this.roleClick}">
     <div class="avatar">
       ${role?.avatar ? html`<img src="${role?.avatar}" onerror="this.src = '/assets/avatar.svg'">` : svg`<svg viewBox="0 0 32 32"><text x="16" y="16" text-anchor="middle" dominant-baseline="middle" fill="currentColor" font-size="20">${role?.name[0]}</text></svg>`}
     </div>
     <div class="name">${role?.name ?? '小派魔'}</div>
     <el-icon class="more">${More}</el-icon>
-    <div class="roles" popover="auto">
+    <div class="roles" popover="manual">
       ${repeat([
         ...default_roles.map((item, index) => (item.index = -(index+1), item)),
         ...(this.roles || []).map((item, index) => (item.index = index, item)),
@@ -269,7 +276,7 @@ el-input::part(inner) {
   
   <el-dialog .open="${this.dialogOpen}" @update:open="${(e) => {
     this.dialogOpen = e.detail.newValue;
-    this.rolesRef.showPopover() 
+    if (e.detail.newValue) this.rolesShow = true;
   } }" .title="${this.roleDialogModal.title}">
     <el-form @submit="${this.onSubmit}">
       <el-form-item label="名称">
@@ -319,6 +326,13 @@ el-input::part(inner) {
         }));
       }
     }
+    if (changedProps.has('rolesShow') && this.rolesRef) {
+      if (this.rolesShow) {
+        this.rolesRef.showPopover();
+      } else {
+        this.rolesRef.hidePopover();
+      }
+    }
   }
   
   show() {
@@ -342,7 +356,10 @@ el-input::part(inner) {
   }
   
   roleClick(e) {
-    if (e.composedPath()[0].classList.contains('currentRole')) this.rolesRef.showPopover();
+    if (!e.composedPath()[0].closest('.roles')) {
+      console.log(this.rolesShow)
+      this.rolesShow = !this.rolesShow;
+    }
   }
   
   switchRole(index) {
@@ -354,7 +371,7 @@ el-input::part(inner) {
         index,
       },
     }));
-    this.rolesRef.hidePopover();
+    this.rolesRef = false;
   }
   
   showRoleDialog(index) {
